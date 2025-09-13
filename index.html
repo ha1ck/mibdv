@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Editor Comprobante Pagomóvil BDV</title>
+  <style>
+    body {
+      background: #111;
+      font-family: Arial, Helvetica, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 20px;
+      margin: 0;
+      color: #fff;
+      gap: 30px;
+    }
+
+    .card {
+      background: #1c1c1c;
+      width: 350px;
+      padding: 30px 20px;
+      border-radius: 10px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    .logo {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 10px;
+    }
+    .logo div {
+      width: 30px;
+      height: 60px;
+      border-radius: 6px;
+      margin: 0 2px;
+      transform: rotate(-10deg);
+    }
+    .yellow { background: #ffd400; }
+    .blue { background: #1398f6; transform: rotate(10deg); }
+    .pink { background: #ff375f; transform: rotate(20deg); }
+
+    .title {
+      font-size: 16px;
+      margin: 8px 0 20px;
+    }
+
+    .check {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: #fff;
+      color: #000;
+      font-weight: bold;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 0 auto 20px;
+    }
+
+    .amount {
+      background: #7a7a7a;
+      padding: 15px;
+      border-radius: 8px;
+      font-size: 22px;
+      font-weight: bold;
+      margin-bottom: 25px;
+    }
+
+    .info {
+      text-align: left;
+      font-size: 14px;
+      line-height: 2;
+    }
+    .row {
+      display: flex;
+      justify-content: space-between;
+      margin: 6px 0;
+    }
+    .label { color: #dcdcdc; }
+
+    /* Panel de edición */
+    .editor {
+      width: 300px;
+      background: #1c1c1c;
+      padding: 20px;
+      border-radius: 10px;
+    }
+    .editor h2 { font-size: 18px; margin-bottom: 15px; }
+    .editor label { font-size: 13px; display: block; margin-top: 10px; color: #ccc; }
+    .editor input {
+      width: 100%;
+      padding: 8px;
+      border: none;
+      border-radius: 6px;
+      margin-top: 4px;
+      background: #333;
+      color: #fff;
+    }
+
+    /* Botón de descarga */
+    .download-btn {
+      margin-top: 20px;
+      padding: 10px 15px;
+      background: #1398f6;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      width: 100%;
+    }
+    .download-btn:hover {
+      background: #0d7ed6;
+    }
+  </style>
+</head>
+<body>
+  <!-- Tarjeta -->
+  <div>
+    <div class="card" id="card">
+      <div class="logo">
+        <img src="logo.png" width="70" height="70" alt="">
+      </div>
+      <div class="title">PagomóvilBDV Personas</div>
+      <div class="check">✓</div>
+      <div class="amount" id="amount">600,00 Bs</div>
+
+      <div class="info">
+        <div class="row"><div class="label">Fecha:</div><div id="fecha">29/04/2025</div></div>
+        <div class="row"><div class="label">Operación:</div><div id="operacion">002672135659</div></div>
+        <div class="row"><div class="label">Identificación:</div><div id="identificacion">19114541</div></div>
+        <div class="row"><div class="label">Origen:</div><div id="origen">0102****2986</div></div>
+        <div class="row"><div class="label">Destino:</div><div id="destino">04145739290</div></div>
+        <div class="row"><div class="label">Banco:</div><div id="banco">0102 - BANCO DE VENEZUELA</div></div>
+        <div class="row"><div class="label">Concepto:</div><div id="concepto">pago</div></div>
+      </div>
+    </div>
+
+    <button class="download-btn" onclick="descargar()">📥 Descargar Comprobante</button>
+  </div>
+
+  <!-- Panel de edición -->
+  <div class="editor">
+    <h2>Editar comprobante</h2>
+    <label>Monto</label>
+    <input type="text" id="inputAmount" value="600,00 Bs">
+
+    <label>Fecha</label>
+    <input type="text" id="inputFecha" value="29/04/2025">
+
+    <label>Operación</label>
+    <input type="text" id="inputOperacion" value="002672135659">
+
+    <label>Identificación</label>
+    <input type="text" id="inputIdentificacion" value="19114541">
+
+    <label>Origen</label>
+    <input type="text" id="inputOrigen" value="0102****2986">
+
+    <label>Destino</label>
+    <input type="text" id="inputDestino" value="04145739290">
+
+    <label>Banco</label>
+    <input type="text" id="inputBanco" value="0102 - BANCO DE VENEZUELA">
+
+    <label>Concepto</label>
+    <input type="text" id="inputConcepto" value="pago">
+  </div>
+
+  <!-- Librería html2canvas -->
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
+  <script>
+    // Enlazar inputs con los campos de la tarjeta
+    const bindings = [
+      { input: "inputAmount", target: "amount" },
+      { input: "inputFecha", target: "fecha" },
+      { input: "inputOperacion", target: "operacion" },
+      { input: "inputIdentificacion", target: "identificacion" },
+      { input: "inputOrigen", target: "origen" },
+      { input: "inputDestino", target: "destino" },
+      { input: "inputBanco", target: "banco" },
+      { input: "inputConcepto", target: "concepto" },
+    ];
+
+    bindings.forEach(b => {
+      document.getElementById(b.input).addEventListener("input", e => {
+        document.getElementById(b.target).innerText = e.target.value;
+      });
+    });
+
+  function descargar() {
+  const card = document.getElementById("card");
+  html2canvas(card, { 
+    backgroundColor: "#111", // Fondo sólido (negro)
+    scale: 3, 
+    useCORS: true 
+  }).then(canvas => {
+    const link = document.createElement("a");
+    link.download = "comprobante-bdv.png";
+    link.href = canvas.toDataURL("image/png");
+    link.click();
+  });
+}
+
+  </script>
+</body>
+</html>
